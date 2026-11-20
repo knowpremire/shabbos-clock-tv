@@ -250,6 +250,12 @@ header {
   line-height: 1.5;
 }
 
+/* Candle lighting has passed: the card counts down to shkiya. */
+.counting .label,
+.counting .shabbat-time {
+  color: var(--gold);
+}
+
 /* Source and save state, under "Shabbos ends". */
 .source {
   margin-top: 7px;

@@ -13,6 +13,8 @@
   const CHABAD_ICS = 'https://www.chabad.org/calendar/candlelighting/candlelighting.ics.asp?locationType=2&weeks=52&locationId=';
   const MINUTE = 60 * 1000;
   const DAY = 24 * 60 * MINUTE;
+  // Chabad's candle-lighting times are 18 minutes before sunset (shkiya).
+  const SHKIYA_AFTER_CANDLES_MS = 18 * MINUTE;
   const REFRESH_AFTER_SUCCESS_MS = 6 * 60 * MINUTE;
   const MAX_ALARM_SECONDS = 600;
   const DEFAULT_SOUND_NAME = 'Phone default alarm';
@@ -227,6 +229,8 @@
       lastClock = digits;
       fitClock();
     }
+    // The shkiya countdown updates every second (and once more when it ends).
+    if (counting || shkiyaCountdown(now.getTime())) renderCache();
     const minute = Math.floor(now.getTime() / MINUTE);
     if (minute !== lastMinute) {
       lastMinute = minute;
@@ -283,6 +287,29 @@
     }
   }
 
+  /**
+   * Between candle lighting and shkiya: {candle, shkiya}. Not for candles lit "after" nightfall
+   * (the second night of Yom Tov), which come after shkiya.
+   */
+  function shkiyaCountdown(now = Date.now()) {
+    const picked = ShabbosCalendar.selectWeek(cache, now);
+    const candles = picked ? picked.week.candles || [picked.week.candle] : [];
+    const candle = candles.find((c) => c.qualifier !== 'after' && now >= c.instant && now < c.instant + SHKIYA_AFTER_CANDLES_MS);
+    return candle ? { candle, shkiya: candle.instant + SHKIYA_AFTER_CANDLES_MS } : null;
+  }
+
+  /** "6:07" "PM" plus minutes, as Chabad writes times (local to the ZIP). */
+  function addMinutes(time, period, minutes) {
+    const [h, m] = time.split(':').map(Number);
+    let total = ((h % 12) + (period === 'PM' ? 12 : 0)) * 60 + m + minutes;
+    total = ((total % 1440) + 1440) % 1440;
+    if (settings.hour24) return String(Math.floor(total / 60)).padStart(2, '0') + ':' + String(total % 60).padStart(2, '0');
+    const hour = Math.floor(total / 60) % 12 || 12;
+    return hour + ':' + String(total % 60).padStart(2, '0') + ' ' + (total >= 720 ? 'PM' : 'AM');
+  }
+
+  let counting = false;
+
   function renderCache() {
     renderDates();
     $('location').textContent = cache?.location || 'Shabbos times · ZIP ' + settings.zip;
@@ -298,6 +325,17 @@
       $('candlePeriod').textContent = candle.period;
       $('candleLabel').textContent = 'Candle lighting' + (candle.qualifier === 'after' || candle.qualifier === 'before' ? ' · ' + candle.qualifier : '');
       $('candleDate').textContent = dateLabel(candle.date);
+      // After candle lighting, the card counts down to shkiya.
+      const countdown = shkiyaCountdown(now);
+      counting = !!countdown;
+      $('candleCard').classList.toggle('counting', counting);
+      if (countdown) {
+        const left = Math.max(0, Math.ceil((countdown.shkiya - now) / 1000));
+        $('candleLabel').textContent = 'Shkiya in';
+        $('candleTime').textContent = Math.floor(left / 60) + ':' + String(left % 60).padStart(2, '0');
+        $('candlePeriod').textContent = '';
+        $('candleDate').textContent = 'Sunset ' + addMinutes(countdown.candle.time, countdown.candle.period, 18);
+      }
       $('endTime').textContent = end.time;
       $('endPeriod').textContent = end.period;
       $('endLabel').textContent = END_LABELS[end.kind] || END_LABELS.shabbat;
@@ -313,6 +351,8 @@
       ['candleTime', 'endTime'].forEach((id) => ($(id).textContent = '—'));
       ['candlePeriod', 'endPeriod'].forEach((id) => ($(id).textContent = ''));
       $('candleLabel').textContent = 'Candle lighting';
+      counting = false;
+      $('candleCard').classList.remove('counting');
       $('endLabel').textContent = END_LABELS.shabbat;
       $('candleDate').textContent = tv ? 'Waiting for your phone' : 'No saved times for ' + settings.zip;
       $('endDate').textContent = tv ? 'Choose this TV in Shabbos Clock' : 'Connect to download';
