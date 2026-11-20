@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <meta name="theme-color" content="#000000" />
+    <title>Shabbos Clock · TV</title>
+    <link rel="stylesheet" href="display.css" />
+  </head>
+  <body>
+    <main id="display">
+      <div id="drift">
+        <header id="header">
+          <span id="location">Brooklyn · 11213</span>
+          <span class="header-right">
+            <span id="alarmDot" role="img" aria-label="Alarm enabled" title="Alarm enabled" hidden></span>
+            <span lang="he">ב״ה</span>
+          </span>
+        </header>
+
+        <section id="center" aria-label="Clock">
+          <div class="clock-line">
+            <div id="clock"><span id="hours">--</span><span id="colon">:</span><span id="minutes">--</span></div>
+            <div class="clock-meta"><span id="seconds">--</span><span id="period">PM</span></div>
+          </div>
+          <div id="dateLine" class="date-line">
+            <div id="civilDate"></div>
+            <div id="hebrewDate"></div>
+          </div>
+        </section>
+
+        <section id="times" aria-label="Shabbat times and weather">
+          <div class="time-card">
+            <div class="label"><i></i><span id="candleLabel">Candle lighting</span></div>
+            <div class="shabbat-time"><span id="candleTime">—</span><small id="candlePeriod"></small></div>
+            <div class="date" id="candleDate">Connect once to save times</div>
+          </div>
+          <div class="time-card">
+            <div class="label"><i></i><span id="endLabel">Shabbos ends</span></div>
+            <div class="shabbat-time"><span id="endTime">—</span><small id="endPeriod"></small></div>
+            <div class="date" id="endDate">Then use the app offline</div>
+            <div id="status" class="source" role="status">Loading saved times…</div>
+          </div>
+          <div id="outlook" class="outlook" aria-label="Forecast" hidden></div>
+          <div id="weatherCard" class="time-card weather-card" hidden>
+            <div class="label"><span id="weatherLabel">Weather</span></div>
+            <div class="shabbat-time"><span id="weatherTemp">--°</span><small id="weatherUnit">F</small></div>
+            <div class="date" id="weatherRange"></div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <nav id="controls" aria-label="Display controls">
+      <button id="settingsButton" aria-label="Settings">⚙ <span>Settings</span></button>
+      <button id="alarmsButton" aria-label="Alarms">◷ <span>Alarms</span></button>
+      <button id="refreshButton" aria-label="Refresh Chabad times">↻ <span>Refresh</span></button>
+      <button id="tvButton" aria-label="Show on TV" hidden>▭ <span>TV</span></button>
+    </nav>
+    <div id="sizeControls">
+      <button id="plus" aria-label="Make clock larger">+</button>
+      <button id="minus" aria-label="Make clock smaller">−</button>
+    </div>
+
+    <dialog id="settings">
+      <form id="settingsForm">
+        <div class="sheet-heading">
+          <div>
+            <div class="eyebrow">YOUR DISPLAY</div>
+            <h1>Make it yours.</h1>
+          </div>
+          <button type="button" id="closeButton" class="close-button" aria-label="Close settings">×</button>
+        </div>
+
+        <label class="option"><span>Use my location<small id="locationText">Sets the ZIP and weather from where the phone is</small></span><input id="autoLocationInput" type="checkbox" /></label>
+        <label class="field-label" for="zipInput">Shabbos location · US ZIP</label>
+        <div class="zip-row">
+          <input id="zipInput" type="text" inputmode="numeric" maxlength="5" pattern="[0-9]{5}" required aria-describedby="zipHelp" />
+          <button type="submit">Save ZIP</button>
+        </div>
+        <p id="zipHelp">Times follow this location. Saving a ZIP yourself turns off “Use my location”.</p>
+        <div id="formError" role="alert"></div>
+
+        <label class="option"><span>Show weather<small id="weatherText">Updates every 30 minutes; the saved forecast works offline</small></span><input id="weatherInput" type="checkbox" /></label>
+        <label class="option"><span>Celsius</span><input id="celsiusInput" type="checkbox" /></label>
+        <label class="option"><span>Keep screen awake<small>While the app is open</small></span><input id="awakeInput" type="checkbox" /></label>
+        <label class="option"><span>24-hour clock</span><input id="hourInput" type="checkbox" /></label>
+        <label class="option"><span>Show seconds</span><input id="secondsInput" type="checkbox" /></label>
+        <label class="option"><span>Standby layout<small>Extra-large clock · stacked in portrait</small></span><input id="standbyInput" type="checkbox" /></label>
+        <label class="option">
+          <span>Screen brightness<small id="brightnessText">System brightness</small></span>
+          <input id="brightnessInput" type="range" min="0" max="100" step="1" aria-label="Screen brightness" />
+        </label>
+        <button id="systemBrightness" type="button" class="text-button">Use phone brightness</button>
+
+        <label class="option"><span>Dim at night<small id="nightDimText">Lowers brightness on a schedule, no touch needed</small></span><input id="nightDimInput" type="checkbox" /></label>
+        <div id="dimOptions" hidden>
+          <div class="field-row">
+            <label>From<input id="dimFrom" type="time" value="22:00" /></label>
+            <label>Until<input id="dimTo" type="time" value="07:00" /></label>
+          </div>
+          <label class="option">
+            <span>Night brightness</span>
+            <input id="dimLevel" type="range" min="2" max="100" step="1" aria-label="Night brightness" />
+          </label>
+        </div>
+
+        <div class="saved-box">
+          <div class="eyebrow">READY WITHOUT WI-FI</div>
+          <div id="cacheInfo">No saved calendar yet.</div>
+          <div id="lastSaved"></div>
+          <div id="syncDetails"></div>
+        </div>
+        <a id="chabadLink" href="https://www.chabad.org/calendar/candlelighting_cdo/locationId/11213/locationType/2/jewish/Candle-Lighting.htm">View times on Chabad.org ↗</a>
+        <p class="note">The display and clock work offline. Chabad refreshes need internet and save about a year of times. If saved weeks run out, the last dates remain visible with an “Expired” label.</p>
+        <p class="note">Yom Tov that runs into or out of Shabbos is shown with its candle lightings. A Yom Tov that doesn't touch Shabbos isn't shown.</p>
+        <p class="note">The Hebrew date moves to the next day at candle lighting and when Shabbos or Yom Tov ends. On other days it changes at midnight.</p>
+        <p class="note">Shabbat times provided by Chabad.org/ShabbatTimes. <a class="inline-link" href="https://open-meteo.com/">Weather data by Open-Meteo.com</a> (CC BY 4.0).</p>
+      </form>
+    </dialog>
+
+    <dialog id="alarms">
+      <section id="alarmListView">
+        <div class="sheet-heading">
+          <div>
+            <div class="eyebrow">SET BEFORE SHABBOS</div>
+            <h1>Alarms</h1>
+          </div>
+          <button id="closeAlarms" class="close-button" aria-label="Close alarms">×</button>
+        </div>
+        <div id="alarmStatus" role="status"></div>
+        <button id="alarmPermission" class="text-button" hidden>Allow alarms &amp; reminders ↗</button>
+        <div id="alarmList"></div>
+        <button id="newAlarm" class="add-alarm">+ Add alarm</button>
+        <p class="note">Each alarm stops by itself after its auto-stop time, fading out over the last 5 seconds. Uses your phone’s time zone and alarm volume.</p>
+      </section>
+
+      <form id="alarmForm" hidden>
+        <div class="sheet-heading">
+          <div>
+            <div class="eyebrow">ALARM</div>
+            <h1 id="alarmFormTitle">New alarm</h1>
+          </div>
+          <button type="button" id="cancelAlarm" class="close-button" aria-label="Back to alarms">‹</button>
+        </div>
+        <input id="alarmId" type="hidden" value="0" />
+        <input id="alarmTime" class="alarm-time" type="time" value="07:00" required aria-label="Alarm time" />
+
+        <div class="field-label">Repeat on</div>
+        <div class="chips">
+          <button type="button" id="dayFri" class="chip">Friday</button>
+          <button type="button" id="daySat" class="chip">Shabbos</button>
+        </div>
+
+        <label class="field-label" for="alarmName">Name (optional)</label>
+        <input id="alarmName" class="alarm-name" type="text" maxlength="80" placeholder="Shacharis" />
+
+        <div class="field-row">
+          <label>Auto-stop after
+            <select id="alarmDuration">
+              <option value="10">10 seconds</option>
+              <option value="30">30 seconds</option>
+              <option value="60">1 minute</option>
+              <option value="120">2 minutes</option>
+              <option value="300">5 minutes</option>
+              <option value="600">10 minutes</option>
+            </select>
+          </label>
+        </div>
+
+        <input id="alarmSound" type="hidden" value="" />
+        <div class="option">
+          <span>Sound<small id="alarmSoundName">Phone default alarm</small></span>
+          <button type="button" id="chooseSound">Change</button>
+        </div>
+        <div class="alarm-test">
+          <button type="button" id="testAlarm" class="text-button">▶ Test sound</button>
+          <button type="button" id="stopAlarm" class="text-button">■ Stop</button>
+          <button type="button" id="defaultSound" class="text-button">Use phone default</button>
+        </div>
+
+        <button id="saveAlarm" class="primary" type="submit">Save alarm</button>
+        <button type="button" id="deleteAlarm" class="text-button danger" hidden>Delete alarm</button>
+      </form>
+    </dialog>
+
+    <dialog id="tv">
+      <div class="sheet-heading">
+        <div>
+          <div class="eyebrow">CHROMECAST</div>
+          <h1>Show on TV</h1>
+        </div>
+        <button id="closeTv" class="close-button" aria-label="Close">×</button>
+      </div>
+      <div id="tvStatus" role="status"></div>
+      <div id="tvList"></div>
+      <button id="tvScan" class="text-button">Search again</button>
+      <button id="tvStop" class="text-button danger" hidden>Stop showing on TV</button>
+      <p class="note">The TV runs the clock by itself, with the Shabbos times, location and settings from this phone, and gets its own weather. Once it's showing, this phone can turn off. The TV and phone need to be on the same Wi-Fi to start it.</p>
+    </dialog>
+
+    <div id="toast" role="status"></div>
+
+    <script>window.SHABBOS_TV = true;</script>
+    <script src="https://www.gstatic.com/cast/sdk/libs/caf_receiver/v3/cast_receiver_framework.js"></script>
+    <script src="calendar.js"></script>
+    <script src="weather.js"></script>
+    <script src="app.js"></script>
+    <script src="tv.js"></script>
+  </body>
+</html>
