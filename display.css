@@ -5,6 +5,11 @@
   font-display: swap;
 }
 
+/* Hidden means hidden, even for elements whose own rule sets display (like .danger). */
+[hidden] {
+  display: none !important;
+}
+
 :root {
   color-scheme: dark;
   --ink: #f3f0e9;
