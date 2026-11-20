@@ -1202,6 +1202,9 @@
   async function start() {
     if (tv) {
       document.body.classList.add('tv');
+      // On the TV the location is a small line under candle lighting; the top bar keeps the date.
+      $('location').classList.add('source');
+      $('candleCard').append($('location'));
       settings.standby = true;
       settings.scale = 1;
     }

@@ -1047,51 +1047,58 @@ body.tv #center {
   top: 43%;
 }
 
-body.tv header,
+body.tv header .header-right {
+  display: none;
+}
+
 body.tv header #civilDate,
 body.tv header #hebrewDate {
-  font-size: 17px;
+  font-size: 14px;
 }
 
 body.tv header .date-line {
-  gap: 20px;
+  gap: 16px;
 }
 
 body.tv .label {
-  font-size: 18px;
-  gap: 10px;
+  font-size: 14px;
+  gap: 9px;
 }
 
 body.tv .label i {
-  width: 7px;
-  height: 7px;
+  width: 5px;
+  height: 5px;
 }
 
 body.tv .shabbat-time {
-  font-size: 56px;
-  margin-top: 8px;
+  font-size: 44px;
+  margin-top: 6px;
 }
 
 body.tv .shabbat-time small {
-  font-size: 18px;
+  font-size: 14px;
 }
 
 body.tv .date,
 body.tv .source {
-  font-size: 16px;
-  margin-top: 6px;
+  font-size: 13px;
+  margin-top: 5px;
 }
 
 body.tv .outlook-temp {
-  font-size: 40px;
-  margin-top: 8px;
+  font-size: 30px;
+  margin-top: 6px;
 }
 
 body.tv #times,
 body.tv .outlook {
-  gap: 48px;
+  gap: 40px;
+}
+
+body.tv #candleCard #location {
+  display: block;
 }
 
 body.tv .clock-meta {
-  font-size: 150%;
+  font-size: 130%;
 }
