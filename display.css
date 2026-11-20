@@ -1058,38 +1058,38 @@ body.tv header .date-line {
 }
 
 body.tv .label {
-  font-size: 15px;
+  font-size: 18px;
   gap: 10px;
 }
 
 body.tv .label i {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
 }
 
 body.tv .shabbat-time {
-  font-size: 46px;
+  font-size: 56px;
   margin-top: 8px;
 }
 
 body.tv .shabbat-time small {
-  font-size: 16px;
+  font-size: 18px;
 }
 
 body.tv .date,
 body.tv .source {
-  font-size: 14px;
+  font-size: 16px;
   margin-top: 6px;
 }
 
 body.tv .outlook-temp {
-  font-size: 32px;
+  font-size: 40px;
   margin-top: 8px;
 }
 
 body.tv #times,
 body.tv .outlook {
-  gap: 44px;
+  gap: 48px;
 }
 
 body.tv .clock-meta {

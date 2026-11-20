@@ -192,7 +192,11 @@
     el.style.setProperty('--clock-stretch', '1');
     el.style.fontSize = '100px';
     const bounds = el.getBoundingClientRect();
-    const width = innerWidth - (settings.standby ? 60 : 70);
+    // In standby the seconds and AM/PM sit beside the digits, so the (centered) clock leaves room
+    // for them on both sides instead of running underneath them.
+    const metaShown = settings.standby && (!$('seconds').hidden || !$('period').hidden);
+    const metaRoom = metaShown ? 2 * ($('clockMeta').getBoundingClientRect().width + 18) : 0;
+    const width = innerWidth - (settings.standby ? 60 : 70) - metaRoom;
     // In portrait, the Shabbos forecast row takes space below the clock: shrink the clock by
     // that much and move it up by half, so its bottom clears the row.
     const outlookRoom = !landscape && !$('outlook').hidden ? $('outlook').getBoundingClientRect().height + 24 : 0;
